@@ -1,7 +1,7 @@
 import json 
 
 class DataStorage:
-  def save(libary):
+  def save(library):
     with open ('Library.json','w') as file:
       file = json.dump(library,file, indent = 4)
 
