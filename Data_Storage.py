@@ -1,7 +1,9 @@
 import json 
 
-def save(x):
-  pass
 
-def load(x):
-  pass
+class DataStorage:
+  def save(libary):
+    pass
+
+  def load(library):
+    pass
