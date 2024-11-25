@@ -15,6 +15,6 @@ class DataStorage:
 class Track_Storage(DataStorage):
   pass
 
-class Playlist(DataStorage):
+class Playlist_Storage(DataStorage):
   pass
   
