@@ -1,20 +1,22 @@
 import json 
+from Musiclib import MusicLibrary
 
 class DataStorage:
-  def save(library):
-    with open ('Library.json','w') as file:
-      file = json.dump(library,file, indent = 4)
+  @staticmethod
+  def save(library,playlists):
+    data = {
+      "Music_Library": [],
+      "Playlist" : []
+      }
+     
+    with open ('MusicData.json','w') as file:
+      json.dump(data,file)
+      
+  @staticmethod
+  def load():
+    try:
+      with open ('MusicData.json','r') as file:
+        data = json.load(file)
+        Library = MusicLibrary()
+        playlist = []
 
-  def load(library):
-    with open ('Libray.json','r') as file:
-      data = json.load(file)
-      return (data)
-
-#Will try to separate Track and Playlist saving and loading
-
-class Track_Storage(DataStorage):
-  pass
-
-class Playlist_Storage(DataStorage):
-  pass
-  
