@@ -5,8 +5,10 @@ class DataStorage:
   @staticmethod
   def save(library,playlists):
     data = {
-      "Music_Library": [],
-      "Playlist" : []
+      "Music_Library": [track.__dict__ for track in library.get_tracks()],
+      "Playlists" : { playlist.name : [track.__dict__ for track in playlist.get_tracks()]
+                    for playlist in playlists
+                   }
       }
      
     with open ('MusicData.json','w') as file:
@@ -18,5 +20,21 @@ class DataStorage:
       with open ('MusicData.json','r') as file:
         data = json.load(file)
         Library = MusicLibrary()
-        playlist = []
+        playlists = []
+      
+            for track_data in data["music_library"]:
+                track = Track(track_data["title"], track_data["artist"], track_data["duration"])
+                library.add_track(track)
+                
+             
+            for playlist_name, track_data_list in data["playlists"].items():
+                playlist = Playlist(playlist_name)
+                for track_data in track_data_list:
+                     track = Track(track_data["title"], track_data["artist"], track_data["duration"])
+                    playlist.add_track(track)
+                playlists.append(playlist)
+
+            return library, playlists
+    except FileNotFoundError:
+        return MusicLibrary(), []
 
