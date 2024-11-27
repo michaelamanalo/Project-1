@@ -39,10 +39,13 @@ class MusicLibrary:
                 print(f"[{i + 1}] {track}")
     
     def search_track(self, title):
+        result=[]
         if not title:
-            return []
+            return result
         else:
-            return [track for track in self.tracks if track.title.lower() == title.lower()]
+            result+= [track for track in self.tracks if track.title.lower() == title.lower()]
+        for i in result:
+            print(i)
         
     def input_track(self):
         title = input('Enter a track title: ')
@@ -69,11 +72,11 @@ while True:
 
 print('\nAll Tracks\n')
 lib.display_tracks()
-
-result = lib.search_track('Number One Girl')
-if result:
-    for track in result:
-        print(f'Searched Track:\n{track}')
-else:
-    print('No track found.')
+lib.search_track('Perfect')
+# result = lib.search_track('Perfect')
+# if result:
+#     for track in result:
+#         print(f'Searched Track:\n{track}')
+# else:
+#     print('No track found.')
 
