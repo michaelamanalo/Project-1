@@ -37,36 +37,28 @@ class Queues:
         self.paganation = 10
         self.total_duration = 0
 
-    def play(self):
-        # Play current track
+    def play(self):      
         pass
     
-    def skip(self):
-        # Move to next track
+    def skip(self):     
         pass
     
     def previous(self):
-        # Move to previous track
         pass
     
     def toggle_shuffle(self):
-        # Toggle shuffle state
         pass
     
     def toggle_repeat(self):
-        # Toggle repeat state
         pass
     
     def add_tracks(self, new_tracks):
-        # Add new tracks to the queue
         pass
     
     def display_queue(self):
-        # Display the queue with pagination and other stats
         pass
     
     def exit(self):
-        # Exit and save the state of the queue
         pass
 
     
