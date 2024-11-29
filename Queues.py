@@ -1,49 +1,15 @@
 import random
-class Node:
-    def __init__(self, track):
-        self.track = track
-        self.next = None
-        self.prev = None
-
-class List:
-    def __init__(self):
-        self.head = None
-        self.tail = None
-        self.size = 0
-
-    def append(self, track):
-        new_node = Node(track)
-        if not self.head:
-            self.head = new_node
-            self.tail = new_node
-        else:
-            self.tail.next = new_node
-            new_node.prev = self.tail
-            self.tail = new_node
-        self.size += 1
-
-    def remove_list(self):
-        self.head = None
-        self.tail = None
-        self.size = 0
-
-class Track:
-    def __init__(self, title, artist, duration):
-        self.title = title
-        self.artist = artist
-        self.duration = duration
-
-    def __repr__(self):
-        return f"{self.title} - {self.artist} ({self.duration // 60}:{self.duration % 60:02d})"
+from Track import Track
+import json
 
 
 class Queues:
     def __init__(self):
-        self.list = List()
+        self.list = []
         self.current = None
         self.shuffle = False
         self.repeat = False
-        self.paganation = 10
+        self.pagination = 10
         self.originalOrder = []
         self.total_duration = 0
 
@@ -95,66 +61,77 @@ class Queues:
         print(f"Shuffle is now {status}.")
 
     def toggle_repeat(self):
-        if self.shuffle:
-            print("Disabling shuffle mode.")
-            self.shuffle = False
         self.repeat = not self.repeat
-        print(f"Repeat mode is now {'On' if self.repeat else 'Off'}.")
+        print(f"Repeat mode is now {'enabled' if self.repeat else 'disabled'}.")
     
     def add_tracks(self, new_tracks):
         for track in new_tracks:
             self.list.append(track)
         if not self.current:
-            self.current = self.list.head
+            self.current = self.list[0]
         self.update_duration()
+
+        print(f"Added {len(new_tracks)} tracks to the queue.")
     
     def display_queue(self):
+        if not self.list:
+            print("The queue is empty.")
+            return
+
+        total_pages = (len(self.list) + self.pagination - 1) // self.pagination
+        current_page = self.current_index // self.pagination + 1 if self.current_index is not None else 1
+
         print(f"Total Duration: {self.total_duration // 3600} hr {self.total_duration % 3600 // 60} min")
-        print(f"Shuffle: {'Shuffle On' if self.shuffle else 'Shuffle Off'}")
-        print(f"Repeat: {'Repeat On' if self.repeat else 'Repeat Off'}")
+        print(f"Shuffle: {'On' if self.shuffle else 'Off'} | Repeat: {'On' if self.repeat else 'Off'}")
+        print(f"Page {current_page} of {total_pages}")
         print("Tracks:")
-        current = self.list.head
-        index = 0
-        page = 1
-        trackCount = 1
-        while current:
-            if trackCount == self.paganation:
-                print(f"Page {page}:")
-                input("Press Enter to view the next page ")
-                trackCount = 0
-                page += 1
 
-            prefix = "(Currently Playing)" if current == self.current else f"({index + 1})"
-            print(f"{prefix}{current.track.title} - {current.track.artist} ({current.track.duration})")
-            current = current.next
-            index += 1
-            trackCount += 1
+        start = (current_page - 1) * self.pagination
+        end = min(start + self.pagination, len(self.list))
+        for i in range(start, end):
+            prefix = "(Currently Playing)" if i == self.current_index else f"({i + 1})"
+            track = self.list[i]
+            print(f"{prefix} {track.title} - {track.artist} ({track.duration})")
 
-        if trackCount > 0:
-            print(f"Page {page}:")
-            
+    def save_queue(self):
+    
+        try:
+            with open("queue.json", "r") as file:
+                existing_tracks = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            existing_tracks = []
+
+        current_tracks = [
+            {"title": track.title, "artist": track.artist, "duration": track.duration}
+            for track in self.list
+        ]
+        existing_tracks.extend(current_tracks)
+
+        with open("queue.json", "w") as file:
+            json.dump(existing_tracks, file, indent=4)
+
+        print("Queues saved.")  
+
+
     def load_queue(self):
-        try: 
-            with open('queue.txt', 'r') as file:
-                for line in file:
-                    parts = line.strip().split(', ')
-                    if len(parts) !=3:
-                        print("Skipping Invalid")
-                        continue
+        try:
+            with open("queue.json", "r") as file:
+                tracks = json.load(file)
 
-                title, artist, duration = line.strip().split(', ')
-                track = Track(title, artist, int(duration))
-                self.list.append(track)
-                self.original_order.append(track)
-                self.total_duration += int(duration)
-
-            print("Queue is loaded.")
+            self.list = [
+                Track(track["title"], track["artist"], track["duration"]) for track in tracks
+            ]
+            self.total_duration = sum(track["duration"] for track in tracks)
+            self.current_index = 0 if self.queue else None
+            print("Queues loaded.")
         except FileNotFoundError:
-            print("No saved queue.")
+            print("No saved queue found.")
+        except json.JSONDecodeError:
+            print("Error decoding JSON. Queue file might be corrupted.")
 
     def exit(self):
         self.save_queue()
-        print("Queue saved.")
+        print("Queues saved.")
 
 
     def queue_menu(self):
@@ -166,7 +143,9 @@ class Queues:
             print("[4] Toggle Repeat")
             print("[5] Toggle Shuffle")
             print("[6] Display Queue")
-            print("[7] Exit Queue Interface")
+            print("[7] Save Queue")
+            print("[8] Load Queue")
+            print("[9] Exit")
 
             choice = input("Enter your choice: ")
 
@@ -183,9 +162,11 @@ class Queues:
             elif choice == "6":
                 self.display_queue()
             elif choice == "7":
-                self.exit()
+                self.save_queue()
+            elif choice == "8":
+                self.load_queue()
+            elif choice == "9":
+                print("Exiting queue interface.")
                 break
             else:
                 print("Invalid choice. Please try again.")
-
-        
