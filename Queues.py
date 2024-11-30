@@ -23,7 +23,6 @@ class Queues:
         else:
             print(f"Playing: {self.queue[self.current_index]}")
 
-
     def skip(self):
         if self.current is None:
             print("No track is currently playing.")
